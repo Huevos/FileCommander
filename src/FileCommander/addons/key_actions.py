@@ -23,7 +23,6 @@ from Tools import Notifications
 #from Tools.UnitConversions import UnitScaler, UnitMultipliers
 # added
 from Plugins.Extensions.FileCommander.UnitConversions import UnitScaler, UnitMultipliers
-from Plugins.Extensions.FileCommander.Console import Console
 
 # Various
 from mimetypes import guess_type
@@ -39,7 +38,6 @@ from time import localtime as time_localtime
 import stat
 import pwd
 import grp
-import time
 import re
 
 import os
@@ -60,7 +58,7 @@ TEXT_EXTENSIONS = frozenset((".txt", ".log", ".py", ".xml", ".html", ".meta", ".
 try:
 	from Screens import DVD
 	DVDPlayerAvailable = True
-except Exception as e:
+except Exception:
 	DVDPlayerAvailable = False
 
 ##################################
@@ -121,7 +119,7 @@ class stat_info:
 		try:
 			pwent = pwd.getpwuid(uid)
 			return pwent.pw_name
-		except KeyError as ke:
+		except KeyError:
 			return _("Unknown user: %d") % uid
 
 	@staticmethod
@@ -129,7 +127,7 @@ class stat_info:
 		try:
 			grent = grp.getgrgid(gid)
 			return grent.gr_name
-		except KeyError as ke:
+		except KeyError:
 			return _("Unknown group: %d") % gid
 
 	@staticmethod
@@ -293,7 +291,7 @@ class key_actions(stat_info):
 			pathname = sourceDir + filename
 		try:
 			st = os.lstat(os.path.normpath(pathname))
-		except:
+		except Exception:
 			return ""
 		info = ' '.join(self.SIZESCALER.scale(st.st_size)) + _("B") + "    "
 		info += self.formatTime(st.st_mtime) + "    "
@@ -320,7 +318,7 @@ class key_actions(stat_info):
 			pathname = sourceDir + filename
 		try:
 			st = os.lstat(os.path.normpath(pathname))
-		except:
+		except Exception:
 			return ()
 
 		dirname = filename if config.plugins.filecommander.dir_sizewalk.value and os.path.isdir(filename) else None
@@ -371,7 +369,7 @@ class key_actions(stat_info):
 	@staticmethod
 	def fileFilter():
 		if config.plugins.filecommander.extension.value == "myfilter":
-			return "^.*\.%s" % config.plugins.filecommander.my_extension.value
+			return r"^.*\.%s" % config.plugins.filecommander.my_extension.value
 		else:
 			return config.plugins.filecommander.extension.value
 
@@ -492,7 +490,7 @@ class key_actions(stat_info):
 				self._opkgArgs = ("install", pkg)
 				self.session.openWithCallback(self.doOpkgCB, MessageBox, _("Program '%s' needs to be installed to run this action.\nInstall the '%s' package to install the program?") % (prog, pkg), type=MessageBox.TYPE_YESNO, default=True, simple=True)
 			else:
-				self.session.open(MessageBox, _("Program '%s' not installed.\nThe package containing this program isn't known.") % (prog, how_to), type=MessageBox.TYPE_ERROR, close_on_any_key=True, simple=True)
+				self.session.open(MessageBox, _("Program '%s' not installed.\nThe package containing this program isn't known.") % prog, type=MessageBox.TYPE_ERROR, close_on_any_key=True, simple=True)
 			return
 
 		filename = self.SOURCELIST.getFilename()
@@ -568,7 +566,7 @@ class key_actions(stat_info):
 				self.session.openWithCallback(self.doOpkgCB, MessageBox, _("Program '%s' needs to be installed to run the '%s' action.\nUninstall the '%s' package to uninstall the program?") % (prog, prog, pkg), type=MessageBox.TYPE_YESNO, default=True, simple=True)
 				return True
 			else:
-				self.session.open(MessageBox, _("Program '%s' is installed.\nThe package containing this program isn't known, so it can't be uninstalled.") % (prog, how_to), type=MessageBox.TYPE_ERROR, close_on_any_key=True, simple=True)
+				self.session.open(MessageBox, _("Program '%s' is installed.\nThe package containing this program isn't known, so it can't be uninstalled.") % prog, type=MessageBox.TYPE_ERROR, close_on_any_key=True, simple=True)
 		return False
 
 	def doOpkgCB(self, ans):
@@ -646,21 +644,21 @@ class key_actions(stat_info):
 		filename = self.sourceDir.getFilename()
 		fileList = self.sourceDir.getFileList()
 		for x in fileList:
-			l = len(x)
 			if x[0][0] is not None:
 				testFileName = x[0][0].lower()
 				_, filetype = os.path.splitext(testFileName)
 			else:
 				testFileName = x[0][0]  # "empty"
 				filetype = None
-			if l == 3 or l == 2:
+			length = len(x)
+			if length in (2, 3):
 				if not x[0][1]:
 					if filetype in AUDIO_EXTENSIONS:
 						if filename == x[0][0]:
 							start_song = i
 						i += 1
 						mp.playlist.addFile(eServiceReference(4097, 0, path + x[0][0]))
-			elif l >= 5:
+			elif length >= 5:
 				testFileName = x[4].lower()
 				_, filetype = os.path.splitext(testFileName)
 				if filetype in AUDIO_EXTENSIONS:
@@ -713,7 +711,7 @@ class key_actions(stat_info):
 				self.session.open(DVD.DVDPlayer, dvd_filelist=[longname])
 		elif filetype in AUDIO_EXTENSIONS:
 			self.play_music(self.SOURCELIST)
-		elif filetype == ".rar" or re.search('\.r\d+$', filetype):
+		elif filetype == ".rar" or re.search(r'\.r\d+$', filetype):
 			self.session.openWithCallback(self.onFileActionCB, RarMenuScreen, self.SOURCELIST, self.TARGETLIST)
 		elif testFileName.endswith(".tar.gz") or filetype in (".tgz", ".tar"):
 			self.session.openWithCallback(self.onFileActionCB, TarMenuScreen, self.SOURCELIST, self.TARGETLIST)
@@ -757,7 +755,7 @@ class key_actions(stat_info):
 		else:
 			try:
 				found_viewer = openFile(self.session, guess_type(longname)[0], longname)
-			except TypeError as e:
+			except TypeError:
 				found_viewer = False
 			if not found_viewer:
 				self.session.open(MessageBox, _("No viewer installed for this file type: %s") % filename, type=MessageBox.TYPE_ERROR, timeout=5, close_on_any_key=True, simple=True)

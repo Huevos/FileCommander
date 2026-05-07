@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from Components.Task import Task, Job, job_manager, AbortedPostcondition, ReturncodePostcondition
+from Components.Task import Task, Job
 # commented out
 # from Tools.Directories import fileExists, shellquote
 from Components.MovieList import MOVIE_EXTENSIONS

@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: iso-8859-1 -*-
 
-from __future__ import print_function
-from Plugins.Plugin import PluginDescriptor
-from Plugins.Extensions.FileCommander.plugin import pname, pdesc
+from Plugins.Extensions.FileCommander.plugin import pname
 
 # Components
-from Components.config import config, ConfigSubsection, ConfigInteger, ConfigYesNo, ConfigText, ConfigDirectory, ConfigSelection, ConfigSet, NoSave, ConfigNothing, ConfigLocations, ConfigSelectionNumber, getConfigListEntry
+from Components.config import config, ConfigInteger, ConfigYesNo, ConfigText, ConfigDirectory, ConfigSelection, NoSave, ConfigNothing, ConfigLocations, ConfigSelectionNumber, getConfigListEntry
 from Components.Label import Label
 # commented out
 # from Components.FileTransfer import FileTransferJob, ALL_MOVIE_EXTENSIONS
@@ -15,10 +13,8 @@ from Components.ActionMap import ActionMap, HelpableActionMap
 from Components.Sources.Boolean import Boolean
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
-from Components.ChoiceList import ChoiceList, ChoiceEntryComponent
 from Components.ConfigList import ConfigListScreen
 from Components.Pixmap import Pixmap
-from Components.Sources.Boolean import Boolean
 
 # Screens
 from Screens.Screen import Screen
@@ -31,7 +27,7 @@ from Screens.HelpMenu import HelpableScreen
 # commented out
 # from Screens.TaskList import TaskListScreen
 from Screens.MovieSelection import defaultMoviePath
-from Screens.InfoBar import InfoBar
+# from Screens.InfoBar import InfoBar
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 
 # Tools
@@ -41,15 +37,13 @@ from Tools.BoundFunction import boundFunction
 from Tools import Notifications
 
 # Various
-from enigma import eConsoleAppContainer, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, eTimer, getDesktop
+from enigma import eConsoleAppContainer, eTimer, getDesktop
 
 import os
 import stat
-import string
 import re
 
 # System mods
-from Plugins.Extensions.FileCommander.InputBox import InputBox
 from Plugins.Extensions.FileCommander.FileList import FileList, MultiFileSelectList, EXTENSIONS
 # added
 from Plugins.Extensions.FileCommander.Console import Console
@@ -68,13 +62,12 @@ pvers = "%s%s" % (_("v"), "2.13")
 
 MOVIEEXTENSIONS = {"cuts": "movieparts", "meta": "movieparts", "ap": "movieparts", "sc": "movieparts", "eit": "movieparts"}
 
-import six
 def _make_filter(media_type):
-	return "(?i)^.*\.(" + '|'.join(sorted((ext for ext, type in six.iteritems(EXTENSIONS) if type == media_type))) + ")$"
+	return r"(?i)^.*\.(" + '|'.join(sorted((ext for ext, type in EXTENSIONS.items() if type == media_type))) + ")$"
 
 
 def _make_rec_filter():
-	return "(?i)^.*\.(" + '|'.join(sorted(["ts"] + [ext == "eit" and ext or "ts." + ext for ext in six.iterkeys(MOVIEEXTENSIONS)])) + ")$"
+	return r"(?i)^.*\.(" + '|'.join(sorted(["ts"] + [ext == "eit" and ext or "ts." + ext for ext in MOVIEEXTENSIONS.keys89])) + ")$"
 
 
 FULLHD = False
@@ -273,9 +266,9 @@ def formatSortingTyp(sortDirs, sortFiles):
 
 
 def cutLargePath(path, label):
-	def getStringSize(string, label):
+	def getStringSize(s, label):
 		label.instance.setNoWrap(1)
-		label.setText("%s" % string)
+		label.setText("%s" % s)
 		return label.instance.calculateSize().width()
 	if path != "/":
 		path = path.rstrip('/')
@@ -309,7 +302,7 @@ def freeDiskSpace(path):
 		else:
 			free = _("%d GB") % (free >> 30)
 		return "%s" % free
-	except:
+	except Exception:
 		return "-?-"
 
 
@@ -573,7 +566,7 @@ class FileCommanderScreen(Screen, HelpableScreen, key_actions):
 			xfile = os.stat(longname)
 			if (xfile.st_size < 1000000):
 				return longname
-		except:
+		except Exception:
 			pass
 		return None
 
@@ -738,7 +731,7 @@ class FileCommanderScreen(Screen, HelpableScreen, key_actions):
 	def goParentfolder(self):
 		if self.disableActions_Timer.isActive():
 			return
-		if self.SOURCELIST.getParentDirectory() != False:
+		if self.SOURCELIST.getParentDirectory() is not False:
 			self.SOURCELIST.changeDir(self.SOURCELIST.getParentDirectory())
 			self.updateHead()
 
@@ -1109,7 +1102,7 @@ class FileCommanderScreen(Screen, HelpableScreen, key_actions):
 									os.rename(sourceDir + movie + ".eit", sourceDir + newmovie + ".eit")
 								else:
 									os.rename(sourceDir + filename + "." + ext, sourceDir + newname + "." + ext)
-							except:
+							except Exception:
 								pass
 				else:
 					os.rename(filename, sourceDir + newname)
@@ -1181,7 +1174,7 @@ class FileCommanderScreen(Screen, HelpableScreen, key_actions):
 		testfile = filename[:-1]
 		if (filename is None) or (sourceDir is None):
 			return
-		if path.islink(testfile):
+		if os.path.islink(testfile):
 			return
 		self.session.openWithCallback(self.domakeSymlink, MessageBox, movetext + " %s in %s" % (filename, targetDir), type=MessageBox.TYPE_YESNO, default=True, simple=True)
 
@@ -1679,7 +1672,7 @@ class FileCommanderScreenFileSelect(Screen, HelpableScreen, key_actions):
 	def goParentfolder(self):
 		if self.ACTIVELIST == self.SOURCELIST:
 			return
-		if self.ACTIVELIST.getParentDirectory() != False:
+		if self.ACTIVELIST.getParentDirectory() is not False:
 			self.ACTIVELIST.changeDir(self.ACTIVELIST.getParentDirectory())
 			self.updateHead()
 

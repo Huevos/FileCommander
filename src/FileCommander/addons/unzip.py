@@ -8,7 +8,6 @@ from Plugins.Extensions.FileCommander.addons.unarchiver import ArchiverMenuScree
 import skin
 # added
 # System mod
-from Plugins.Extensions.FileCommander.Console import Console
 
 # for locale (gettext)
 from . import _

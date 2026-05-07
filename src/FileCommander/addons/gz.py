@@ -5,8 +5,8 @@ from __future__ import print_function
 from Components.config import config
 # commented out
 #from Tools.Directories import shellquote
+from Plugins.Extensions.FileCommander.Directories import shellquote
 # added
-from Plugins.Extensions.FileCommander.Directories import fileExists, resolveFilename, SCOPE_PLUGINS
 from Plugins.Extensions.FileCommander.addons.unarchiver import ArchiverMenuScreen, ArchiverInfoScreen
 from os.path import splitext
 

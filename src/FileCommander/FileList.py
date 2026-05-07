@@ -50,7 +50,7 @@ def getPNGByExt(name):
 		_, ex = os.path.splitext(basename)
 		if ex == ".tar":
 			ext = "tgz"
-	elif re.match("^r\d+$", ext):
+	elif re.match(r"^r\d+$", ext):
 		ext = "rar"
 
 	if ext in EXTENSIONS:
@@ -174,7 +174,7 @@ class FileList(FileListBase):
 			if fileExists(directory):
 				try:
 					files = os.listdir(directory)
-				except:
+				except Exception:
 					files = []
 				#files.sort()
 				tmpfiles = files[:]
@@ -443,7 +443,7 @@ class MultiFileSelectList(FileList):
 			if fileExists(directory):
 				try:
 					files = os.listdir(directory)
-				except:
+				except Exception:
 					files = []
 				#files.sort()
 				tmpfiles = files[:]

@@ -5,11 +5,8 @@ from __future__ import print_function
 from enigma import eTimer
 from Screens.Screen import Screen
 from Components.ActionMap import ActionMap
-from Components.Button import Button
-from Components.Label import Label
 from Components.Sources.List import List
 from Components.Sources.StaticText import StaticText
-from Components.MultiContent import MultiContentEntryText
 from Components.Task import job_manager
 
 # for locale (gettext)

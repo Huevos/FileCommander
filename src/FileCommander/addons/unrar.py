@@ -89,9 +89,9 @@ class RarMenuScreen(ArchiverMenuScreen):
 	def log(self, data):
 		data = data.decode()
 		# print("[RarMenuScreen] log", data)
-		status = re.findall('(\d+)%', data)
+		status = re.findall(r'(\d+)%', data)
 		if status:
-			if not status[0] in self.ulist:
+			if status[0] not in self.ulist:
 				self.ulist.append((status[0]))
 				self.chooseMenuList2.setList(map(self.UnpackListEntry, status))
 				self['unpacking'].selectionEnabled(0)

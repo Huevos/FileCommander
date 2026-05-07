@@ -7,13 +7,13 @@ from enigma import eEnv
 try:
 	from os import chmod
 	have_chmod = True
-except:
+except Exception:
 	have_chmod = False
 
 try:
 	from os import utime
 	have_utime = True
-except:
+except Exception:
 	have_utime = False
 
 SCOPE_TRANSPONDERDATA = 0
@@ -73,8 +73,7 @@ FILE_MOVE = 1 # move files
 PATH_COPY = 2 # copy the complete fallback dir to the basedir
 PATH_MOVE = 3 # move the fallback dir to the basedir (can be used for changes in paths)
 fallbackPaths = {
-		SCOPE_CONFIG: [("/home/root/", FILE_MOVE),
-					   (eEnv.resolve("${datadir}/enigma2/defaults/"), FILE_COPY)],
+		SCOPE_CONFIG: [("/home/root/", FILE_MOVE), (eEnv.resolve("${datadir}/enigma2/defaults/"), FILE_COPY)],
 		SCOPE_HDD: [("/media/hdd/movie", PATH_MOVE)],
 		SCOPE_TIMESHIFT: [("/media/hdd/timeshift", PATH_MOVE)],
 		SCOPE_AUTORECORD: [("/media/hdd/movie", PATH_MOVE)]
@@ -203,7 +202,7 @@ def resolveFilename(scope, base="", path_prefix=None):
 					if fileExists(x[0] + base):
 						try:
 							os.link(x[0] + base, path + base)
-						except:
+						except Exception:
 							os.system("cp " + x[0] + base + " " + path + base)
 						break
 				elif x[1] == FILE_MOVE:
@@ -238,7 +237,7 @@ def defaultRecordingLocation(candidate=None):
 	# First, try whatever /hdd points to, or /media/hdd
 	try:
 		path = os.readlink('/hdd')
-	except:
+	except Exception:
 		path = '/media/hdd'
 	if not os.path.exists(path):
 		path = ''
@@ -275,7 +274,7 @@ def createDir(path, makeParents=False):
 			os.makedirs(path)
 		else:
 			os.mkdir(path)
-	except:
+	except Exception:
 		return 0
 	else:
 		return 1
@@ -284,7 +283,7 @@ def createDir(path, makeParents=False):
 def removeDir(path):
 	try:
 		os.rmdir(path)
-	except:
+	except Exception:
 		return 0
 	else:
 		return 1
@@ -384,7 +383,7 @@ def copyfile(src, dst):
 			chmod(dst, mode)
 		if have_utime:
 			utime(dst, (st.st_atime, st.st_mtime))
-	except:
+	except Exception:
 		print("copy", src, "to", dst, "failed!")
 		return -1
 	return 0
@@ -409,7 +408,7 @@ def copytree(src, dst, symlinks=False):
 				copytree(srcname, dstname, symlinks)
 			else:
 				copyfile(srcname, dstname)
-		except:
+		except Exception:
 			print("dont copy srcname (no file or link or folder)")
 	try:
 		st = os.stat(src)
@@ -418,7 +417,7 @@ def copytree(src, dst, symlinks=False):
 			chmod(dst, mode)
 		if have_utime:
 			utime(dst, (st.st_atime, st.st_mtime))
-	except:
+	except Exception:
 		print("copy stats for", src, "failed!")
 
 # Renames files or if source and destination are on different devices moves them in background
@@ -445,7 +444,7 @@ def moveFiles(fileList):
 		for item in movedList:
 			try:
 				os.rename(item[1], item[0])
-			except:
+			except Exception:
 				print("[Directories] Failed to undo move:", item)
 				raise
 

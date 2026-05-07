@@ -5,7 +5,6 @@ from Components.ActionMap import ActionMap
 from Components.ScrollLabel import ScrollLabel
 from Components.Sources.StaticText import StaticText
 from Screens.MessageBox import MessageBox
-from Components.Label import Label
 
 # for locale (gettext)
 from . import _
@@ -85,7 +84,7 @@ class Console(Screen):
 			self.toggleScreenHide(True)
 			if self.cancel_msg:
 				self.cancel_msg.close()
-			lastpage = self["text"].isAtLastPage()
+			self["text"].isAtLastPage()
 			self["text"].appendText('\n' + _("Execution finished!!"))
 			self["summary_description"].setText('\n' + _("Execution finished!!"))
 			if self.finishedCallback is not None:
@@ -168,7 +167,7 @@ class Console(Screen):
 						text += 'script listing: %s\n\n%s\n\n' % (script, self.readFile(script))
 					if len(cmdlist) > 1:
 						text += 'next commands:\n\n' + '\n'.join(cmdlist[1:]) + '\n\n'
-				except:
+				except Exception:
 					text += 'error read commands!!!\n\n'
 				text += '-' * 50 + '\n\noutputs ...\n\n%s' % self["text"].getText()
 				try:
@@ -177,7 +176,7 @@ class Console(Screen):
 					f.close()
 					self["key_green"].setText(_("Load"))
 					return
-				except:
+				except Exception:
 					failtext = _("File write error: '%s'") % self.output_file
 			self.output_file = 'end'
 			self["key_green"].setText('')
@@ -197,7 +196,7 @@ class Console(Screen):
 			with open(file, 'r') as rdfile:
 				rd = rdfile.read()
 			rdfile.close()
-		except:
+		except Exception:
 			if file == self.output_file:
 				rd = self["text"].getText()
 			else:

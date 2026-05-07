@@ -10,7 +10,7 @@ from Components.MenuList import MenuList
 from Components.Sources.StaticText import StaticText
 from Tools.BoundFunction import boundFunction
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryProgress
-from enigma import eConsoleAppContainer, eListboxPythonMultiContent, gFont, RT_HALIGN_LEFT, RT_HALIGN_CENTER, RT_VALIGN_CENTER
+from enigma import eConsoleAppContainer, eListboxPythonMultiContent, gFont, RT_HALIGN_LEFT, RT_VALIGN_CENTER
 import subprocess
 import skin
 
@@ -147,7 +147,7 @@ class ArchiverMenuScreen(Screen):
 		output = list(map(str.splitlines, [o.decode() for o in p.communicate()]))
 		if output[0] and output[1]:
 			output[1].append("----------")
-		self.extractlist = [(l,) for l in output[1] + output[0]]
+		self.extractlist = [(x,) for x in output[1] + output[0]]
 		if not self.extractlist:
 			self.extractlist = [(_("No files found."),)]
 		self.session.open(infoScreen, self.extractlist, self.sourceDir, self.filename)

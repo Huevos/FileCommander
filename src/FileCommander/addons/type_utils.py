@@ -22,15 +22,10 @@ from Screens.VirtualKeyBoard import VirtualKeyBoard
 
 # Tools
 from Tools.Directories import fileExists
-from Tools.BoundFunction import boundFunction
 
 # Various
 from Plugins.Extensions.FileCommander.InputBox import InputBoxWide
-from enigma import eTimer, ePicLoad, getDesktop, gFont, eSize
-
-from Tools.TextBoundary import getTextBoundarySize
-
-import skin
+from enigma import eTimer, ePicLoad, getDesktop
 
 import os
 
@@ -187,7 +182,7 @@ class vEditor(Screen, HelpableScreen):
 				lineNo += 1
 			flines.close()
 			self["list_head"] = Label(fx)
-		except:
+		except Exception:
 			pass
 
 	def editLine(self):
@@ -221,9 +216,9 @@ class vEditor(Screen, HelpableScreen):
 
 					if sw > w:
 						if end: # editation from end
-							l = len(text)
+							txt_len = len(text)
 							for i, idx in enumerate(text):
-								x = text[l - i:]
+								x = text[txt_len - i:]
 								print(x)
 								if getStringSize(x, label) >= w:
 									return i
@@ -235,13 +230,13 @@ class vEditor(Screen, HelpableScreen):
 									return i
 							return i
 					return w // getStringSize("0", label) # approximate number of characters in label
-				except:
+				except Exception:
 					return 100 # default value, if missing label "InputBoxWide_input" in vEditor skin
 
 			length = getMaxPosition(editableText, self["InputBoxWide_input"], end=firstpos_end) - 1
 
 			self.session.openWithCallback(self.callbackEditLine, InputBoxWide, title="%s %s" % (_("Original:"), editableText), visible_width=length, overwrite=False, firstpos_end=firstpos_end, allmarked=False, windowTitle=_("Edit line ") + str(self.selLine + 1), text=editableText)
-		except:
+		except Exception:
 			msg = self.session.open(MessageBox, _("This line is not editable!"), MessageBox.TYPE_ERROR)
 			msg.setTitle(_("Error..."))
 
@@ -307,7 +302,7 @@ class vEditor(Screen, HelpableScreen):
 					my_x = x.partition(": ")[2]
 					eFile.writelines(my_x)
 				eFile.close()
-			except:
+			except Exception:
 				pass
 			self.close()
 		else:
@@ -455,8 +450,8 @@ class ImageViewer(Screen, HelpableScreen):
 		# Ensure that Plugins.Extensions.PicturePlayer exists and
 		# that the config.pic config variables have been initialised.
 		try:
-			import Plugins.Extensions.PicturePlayer.ui
-		except:
+			import Plugins.Extensions.PicturePlayer.ui  # noqa: F401
+		except Exception:
 			self.session.open(MessageBox, _("The Image Viewer component of the File Commander requires the PicturePlayer extension. Install PicturePlayer to enable this operation."), MessageBox.TYPE_ERROR)
 			self.close()
 			return
@@ -517,12 +512,12 @@ class ImageViewer(Screen, HelpableScreen):
 		i = 0
 		start_pic = -1
 		for x in fileList:
-			l = len(fileList[0])
+			list_len = len(fileList[0])
 			if x[0][0] is not None:
 				testfilename = x[0][0].lower()
 			else:
 				testfilename = x[0][0]  # "empty"
-			if l == 3 or l == 2:
+			if list_len in (2, 3):
 				if not x[0][1] and ((testfilename.endswith(".jpg")) or (testfilename.endswith(".jpeg")) or (testfilename.endswith(".jpe")) or (testfilename.endswith(".png")) or (testfilename.endswith(".bmp"))):
 					if self.filename == x[0][0]:
 						start_pic = i
@@ -565,7 +560,7 @@ class ImageViewer(Screen, HelpableScreen):
 			try:
 				text = picInfo.split('\n', 1)
 				text = "(" + str(self.currentIndex + 1) + "/" + str(self.fileListLen + 1) + ") " + text[0].split('/')[-1]
-			except:
+			except Exception:
 				pass
 			self.currentImage = []
 			self.currentImage.append(text)
